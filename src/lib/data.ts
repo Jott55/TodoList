@@ -6,7 +6,7 @@ const sql = postgres(process.env.POSTGRES_URL!)
 
 export class Data {
 
-    static async getTasks(customer_id: number) {
+    static async getTasks(customer_id: number): Promise<TaskRaw[] | null> {
         try {
             const data = await sql<TaskRaw[]>`
             SELECT tasks.id, tasks.completed, tasks.content
@@ -21,7 +21,7 @@ export class Data {
     }
 
 
-    static async createCustomersTable() {
+    static async createCustomersTable(): Promise<void> {
         try {
             await sql` CREATE TABLE customers (
                 id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -33,7 +33,7 @@ export class Data {
             console.error(err)
         }
     }
-    static async createCustomer(customer: Customer) {
+    static async createCustomer(customer: Customer): Promise<void> {
         try {
             await sql`
             INSERT INTO customers (username, password)
@@ -44,7 +44,7 @@ export class Data {
         }
     }
 
-    static async createTaskTable() {
+    static async createTaskTable(): Promise<void> {
         try {
             await sql`
             CREATE TABLE tasks (
@@ -59,7 +59,7 @@ export class Data {
         }
     }
 
-    static async createTask(task: Task) {
+    static async createTask(task: Task): Promise<void> {
         try {
             await sql<TaskRaw[]>`
             INSERT INTO tasks (customer_id, completed, content) 
@@ -70,7 +70,7 @@ export class Data {
         }
     }
 
-    static async dropTaskTable() {
+    static async dropTaskTable(): Promise<void>{
         try {
             await sql`
             DROP TABLE tasks
@@ -80,7 +80,7 @@ export class Data {
         }
     }
 
-    static async dropCustomerTable() {
+    static async dropCustomerTable(): Promise<void> {
         try {
             await sql`
             DROP TABLE customers
@@ -90,7 +90,7 @@ export class Data {
         }
     }
 
-    static async delete_task(customer_id: number, task_id: number) {
+    static async delete_task(customer_id: number, task_id: number): Promise<void> {
         try {
             await sql`
             DELETE FROM tasks WHERE tasks.customer_id=${customer_id} AND tasks.id=${task_id}
@@ -101,7 +101,7 @@ export class Data {
     }
 
 
-    static async update_task_completed(customer_id: number, task_id: number, completed: boolean) {
+    static async update_task_completed(customer_id: number, task_id: number, completed: boolean): Promise<void> {
         try {
             await sql`
             UPDATE tasks SET completed=${completed} WHERE customer_id=${customer_id} AND id=${task_id}
@@ -111,7 +111,7 @@ export class Data {
         }
     }
 
-    static async testCustomerTable() {
+    static async testCustomerTable(): Promise<boolean> {
         try {
 
             const res = await sql<TestTable[]>`
@@ -128,10 +128,10 @@ export class Data {
         catch (err) {
             console.error(err)
         }
-        return null;
+        return false;
     }
 
-    static async testTasksTable() {
+    static async testTasksTable(): Promise<boolean> {
         try {
             const res = await sql<TestTable[]>`
             SELECT EXISTS (
@@ -147,7 +147,7 @@ export class Data {
         catch (err) {
             console.error(err);
         }
-        return null
+        return false
     }
 
     static async findCustomerById(id: number): Promise<Customer | null> {
