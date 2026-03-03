@@ -1,4 +1,5 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Hello, world
+This is my first project on Next.js, so I made a simple todo list that uses the POSTGRESQL database.
 
 ## Getting Started
 
@@ -15,3 +16,11 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Admin Page
+In this page, you can create/delete the database tables for the project it expects you to have a postgresql database running on background. The database URL must be written in the **.env** file in the **root** directory of the project as
+#### POSTGRES_URL=postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&param2=value2]
+___
+## Todo list:
+
+![](todolist.png)
