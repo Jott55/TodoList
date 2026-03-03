@@ -8,7 +8,6 @@ export class Data {
 
     static async getTasks(customer_id: number) {
         try {
-
             const data = await sql<TaskRaw[]>`
             SELECT tasks.id, tasks.completed, tasks.content
             FROM tasks
@@ -16,29 +15,38 @@ export class Data {
             ORDER BY id
             `
             return data
-        } catch(err) {
+        } catch (err) {
             return null
         }
     }
 
 
     static async createCustomersTable() {
-        await sql` CREATE TABLE customers (
-            id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-            username VARCHAR(64),
-            password VARCHAR(64)
-            );
-            `
+        try {
+            await sql` CREATE TABLE customers (
+                id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                username VARCHAR(64),
+                password VARCHAR(64)
+                );
+                `
+        } catch (err) {
+            console.error(err)
+        }
     }
     static async createCustomer(customer: Customer) {
-        await sql`
+        try {
+            await sql`
             INSERT INTO customers (username, password)
             VALUES (${customer.name}, ${customer.password})
             `
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     static async createTaskTable() {
-        await sql`
+        try {
+            await sql`
             CREATE TABLE tasks (
                 id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                 customer_id bigint REFERENCES customers,
@@ -46,77 +54,111 @@ export class Data {
                 content VARCHAR(64)
                 );
                 `
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     static async createTask(task: Task) {
-        await sql<TaskRaw[]>`
-                INSERT INTO tasks (customer_id, completed, content) 
-                VALUES (${task.customer_id}, ${task.completed}, ${task.content}); 
-                `
+        try {
+            await sql<TaskRaw[]>`
+            INSERT INTO tasks (customer_id, completed, content) 
+            VALUES (${task.customer_id}, ${task.completed}, ${task.content}); 
+            `
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     static async dropTaskTable() {
-        await sql`
+        try {
+            await sql`
             DROP TABLE tasks
-        `
+            `
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     static async dropCustomerTable() {
-        await sql`
+        try {
+            await sql`
             DROP TABLE customers
-        `
+            `
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     static async delete_task(customer_id: number, task_id: number) {
-        await sql`
+        try {
+            await sql`
             DELETE FROM tasks WHERE tasks.customer_id=${customer_id} AND tasks.id=${task_id}
-        `
+            `
+        } catch (err) {
+            console.error(err)
+        }
     }
 
 
     static async update_task_completed(customer_id: number, task_id: number, completed: boolean) {
-        await sql`
+        try {
+            await sql`
             UPDATE tasks SET completed=${completed} WHERE customer_id=${customer_id} AND id=${task_id}
-        `
+            `
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     static async testCustomerTable() {
-        const res = await sql<TestTable[]>`
+        try {
+
+            const res = await sql<TestTable[]>`
             SELECT EXISTS (
                 SELECT 1
                 FROM information_schema.tables
                 WHERE table_schema='public'
                 AND table_name='customers'
-            )
-        `
+                )
+                `
 
-        return res[0].exists;
+            return res[0].exists;
+        }
+        catch (err) {
+            console.error(err)
+        }
+        return null;
     }
 
     static async testTasksTable() {
-        const res = await sql<TestTable[]>`
+        try {
+            const res = await sql<TestTable[]>`
             SELECT EXISTS (
                 SELECT 1
                 FROM information_schema.tables
                 WHERE table_schema='public'
                 AND table_name='tasks'
-            )
-        `
+                )
+                `
 
-        return res[0].exists;
+            return res[0].exists;
+        }
+        catch (err) {
+            console.error(err);
+        }
+        return null
     }
 
     static async findCustomerById(id: number): Promise<Customer | null> {
         try {
-
             const userRow = await sql<Customer[]>`SELECT username, password FROM customers WHERE id=${id}`
             if (userRow.length === 1) {
                 return userRow[0]
             }
-            return null
         } catch (err) {
-            return null
+            console.error(err)
         }
-        
+        return null
     }
 }
