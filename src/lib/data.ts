@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import { Customer, Task, TaskRaw } from "./types";
+import { Customer, Task, TaskRaw, TestTable } from "./types";
 import { refresh } from "next/cache";
 
 const sql = postgres(process.env.POSTGRES_URL!)
@@ -7,13 +7,18 @@ const sql = postgres(process.env.POSTGRES_URL!)
 export class Data {
 
     static async getTasks(customer_id: number) {
-        const data = await sql<TaskRaw[]>`
-        SELECT tasks.id, tasks.completed, tasks.content
-        FROM tasks
-        WHERE tasks.customer_id=${customer_id}
-        ORDER BY id
-        `
-        return data
+        try {
+
+            const data = await sql<TaskRaw[]>`
+            SELECT tasks.id, tasks.completed, tasks.content
+            FROM tasks
+            WHERE tasks.customer_id=${customer_id}
+            ORDER BY id
+            `
+            return data
+        } catch(err) {
+            return null
+        }
     }
 
 
@@ -56,6 +61,12 @@ export class Data {
         `
     }
 
+    static async dropCustomerTable() {
+        await sql`
+            DROP TABLE customers
+        `
+    }
+
     static async delete_task(customer_id: number, task_id: number) {
         await sql`
             DELETE FROM tasks WHERE tasks.customer_id=${customer_id} AND tasks.id=${task_id}
@@ -67,5 +78,45 @@ export class Data {
         await sql`
             UPDATE tasks SET completed=${completed} WHERE customer_id=${customer_id} AND id=${task_id}
         `
+    }
+
+    static async testCustomerTable() {
+        const res = await sql<TestTable[]>`
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema='public'
+                AND table_name='customers'
+            )
+        `
+
+        return res[0].exists;
+    }
+
+    static async testTasksTable() {
+        const res = await sql<TestTable[]>`
+            SELECT EXISTS (
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema='public'
+                AND table_name='tasks'
+            )
+        `
+
+        return res[0].exists;
+    }
+
+    static async findCustomerById(id: number): Promise<Customer | null> {
+        try {
+
+            const userRow = await sql<Customer[]>`SELECT username, password FROM customers WHERE id=${id}`
+            if (userRow.length === 1) {
+                return userRow[0]
+            }
+            return null
+        } catch (err) {
+            return null
+        }
+        
     }
 }

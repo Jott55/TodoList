@@ -23,3 +23,7 @@ export interface Customer {
     name: string,
     password: string
 }
+
+export interface TestTable {
+    exists: boolean
+}

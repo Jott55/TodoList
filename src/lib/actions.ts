@@ -10,8 +10,7 @@ export async function ac_fetch_customer_task() {
     return data
 }
 
-export async function ac_create_task(formData: FormData): Promise<Task | null> {
-    
+export async function ac_create_task(formData: FormData): Promise<Task | null> {    
     const taskSchema = z.object({
         content: z.string().trim().min(3).max(32)
     })

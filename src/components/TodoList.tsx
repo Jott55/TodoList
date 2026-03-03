@@ -4,11 +4,10 @@ import TaskBox from "./TaskBox/TaskBox";
 import { TaskRaw } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { Suspense } from "react";
+import TaskBoxContainer from "./TaskBoxContainer";
+import TaskBoxContainerSkeleton from "./TaskBoxContainerSkeleton";
 
 export async function TodoList() {
-
-  const tasks = await ac_fetch_customer_task();
-
   async function form_action(form: FormData) {
     'use server'
     await ac_create_task(form)
@@ -27,7 +26,9 @@ export async function TodoList() {
           </button>
         </form>
         <div className="overflow-auto max-h-full">
-          {tasks ? tasks.map(task => <TaskBox key={task.id} id={task.id} completed={task.completed} content={task.content} />): <div><p>Loading...</p></div> }
+          <Suspense fallback={<TaskBoxContainerSkeleton />}>
+            <TaskBoxContainer />
+          </Suspense>
         </div>
       </div>
     </div>
