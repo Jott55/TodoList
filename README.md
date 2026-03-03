@@ -20,7 +20,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ## Admin Page
 In this page, you can create/delete the database tables for the project it expects you to have a postgresql database running on background. The database URL must be written in the **.env** file in the **root** directory of the project as
 #### POSTGRES_URL=postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&param2=value2]
-___
+
 ## Todo list:
 
 ![](todolist.png)
